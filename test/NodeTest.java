@@ -1,6 +1,8 @@
+import junit.framework.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
@@ -21,7 +23,7 @@ public class NodeTest {
     public void shouldReachTheNeighbour() {
         Node nodeA = new Node("a", new ArrayList<>());
         Node nodeB = new Node("b", new ArrayList<>());
-        nodeA.connects(nodeB);
+        nodeA.connects(nodeB, 0.0);
         assertThat(nodeA.canReach(nodeB),is(equalTo(true)));
     }
 
@@ -30,8 +32,8 @@ public class NodeTest {
         Node nodeA = new Node("a", new ArrayList<>());
         Node nodeB = new Node("b", new ArrayList<>());
         Node nodeC = new Node("c", new ArrayList<>());
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeC);
+        nodeA.connects(nodeB, 0.0);
+        nodeB.connects(nodeC, 0.0);
         assertThat(nodeA.canReach(nodeC),is(equalTo(true)));
     }
 
@@ -40,9 +42,9 @@ public class NodeTest {
         Node nodeA = new Node("a", new ArrayList<>());
         Node nodeB = new Node("b", new ArrayList<>());
         Node nodeC = new Node("c", new ArrayList<>());
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeA);
-        nodeB.connects(nodeC);
+        nodeA.connects(nodeB, 0.0);
+        nodeB.connects(nodeA, 0.0);
+        nodeB.connects(nodeC, 0.0);
         assertThat(nodeA.canReach(nodeC),is(equalTo(true)));
     }
 
@@ -58,79 +60,19 @@ public class NodeTest {
         Node nodeG = new Node("g", new ArrayList<>());
         Node nodeH = new Node("h", new ArrayList<>());
 
-        nodeA.connects(nodeF);
-        nodeB.connects(nodeC);
-        nodeB.connects(nodeA);
-        nodeC.connects(nodeD);
-        nodeC.connects(nodeE);
-        nodeC.connects(nodeE);
-        nodeD.connects(nodeE);
-        nodeE.connects(nodeB);
-        nodeH.connects(nodeB);
+        nodeA.connects(nodeF, 0.0);
+        nodeB.connects(nodeC, 0.0);
+        nodeB.connects(nodeA, 0.0);
+        nodeC.connects(nodeD, 0.0);
+        nodeC.connects(nodeE, 0.0);
+        nodeC.connects(nodeE, 0.0);
+        nodeD.connects(nodeE, 0.0);
+        nodeE.connects(nodeB, 0.0);
+        nodeH.connects(nodeB, 0.0);
 
         assertTrue(nodeH.canReach(nodeE));
         assertFalse(nodeH.canReach(nodeG));
         assertTrue(nodeB.canReach(nodeD));
-    }
-
-    @Test
-    public void shouldReturn0WhenANodeIsReachedFromItself() {
-        Node nodeA = new Node("a",new ArrayList<>());
-        assertEquals(0,nodeA.findMinDistance(nodeA));
-    }
-
-    @Test
-    public void shouldReturn1WhenANodeIsItsImmediateNeighbour() {
-        Node nodeA = new Node("a", new ArrayList<>());
-        Node nodeB = new Node("b", new ArrayList<>());
-        nodeA.connects(nodeB);
-        assertEquals(1,nodeA.findMinDistance(nodeB));
-    }
-
-    @Test
-    public void shouldReturnMinimumDistanceAs2WhenDestinationIsReachedInTwoHops() {
-        Node nodeA = new Node("a", new ArrayList<>());
-        Node nodeB = new Node("b", new ArrayList<>());
-        Node nodeC = new Node("c", new ArrayList<>());
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeC);
-
-        assertEquals(2,nodeA.findMinDistance(nodeC));
-    }
-
-    @Test
-    public void shouldReturnMinimumDistanceAs2WhenDestinationIsReachedInTwoWays() {
-        Node nodeA = new Node("a", new ArrayList<>());
-        Node nodeB = new Node("b", new ArrayList<>());
-        Node nodeC = new Node("c", new ArrayList<>());
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeC);
-        nodeA.connects(nodeC);
-        assertEquals(1,nodeA.findMinDistance(nodeC));
-    }
-
-    @Test
-    public void shouldReturnMinimumDistanceAs2WhenSeveralPathsExist() {
-        Node nodeA = new Node("a", new ArrayList<>());
-        Node nodeB = new Node("b", new ArrayList<>());
-        Node nodeC = new Node("c", new ArrayList<>());
-        Node nodeD = new Node("c", new ArrayList<>());
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeC);
-        nodeC.connects(nodeD);
-        nodeA.connects(nodeC);
-        assertEquals(2,nodeA.findMinDistance(nodeD));
-    }
-
-    @Test
-    public void shouldReturnIntegerMaxValueWhenNoPathExist() {
-        Node nodeA = new Node("a", new ArrayList<>());
-        Node nodeB = new Node("b", new ArrayList<>());
-        Node nodeC = new Node("c", new ArrayList<>());
-        Node nodeD = new Node("c", new ArrayList<>());
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeC);
-        assertEquals(Integer.MAX_VALUE,nodeA.findMinDistance(nodeD));
     }
 
     @Test
@@ -144,7 +86,7 @@ public class NodeTest {
         Node nodeA = new Node("a", new ArrayList<>());
         Node nodeB = new Node("b", new ArrayList<>());
 
-        nodeA.connects(nodeB);
+        nodeA.connects(nodeB, 0.0);
 
         List<Node> shortestPath = nodeA.findShortestPathBasedOnHopCount(nodeB);
 
@@ -158,10 +100,10 @@ public class NodeTest {
         Node nodeB = new Node("b", new ArrayList<>());
         Node nodeC = new Node("c", new ArrayList<>());
         Node nodeD = new Node("d", new ArrayList<>());
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeC);
-        nodeC.connects(nodeD);
-        nodeA.connects(nodeC);
+        nodeA.connects(nodeB, 0.0);
+        nodeB.connects(nodeC, 0.0);
+        nodeC.connects(nodeD, 0.0);
+        nodeA.connects(nodeC, 0.0);
 
         List<Node> shortestPath = nodeA.findShortestPathBasedOnHopCount(nodeD);
 
@@ -175,9 +117,9 @@ public class NodeTest {
         Node nodeA = new Node("a", new ArrayList<>());
         Node nodeB = new Node("b", new ArrayList<>());
         Node nodeC = new Node("c", new ArrayList<>());
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeA);
-        nodeB.connects(nodeC);
+        nodeA.connects(nodeB, 0.0);
+        nodeB.connects(nodeA, 0.0);
+        nodeB.connects(nodeC, 0.0);
 
         List<Node> shortestPath = nodeA.findShortestPathBasedOnHopCount(nodeC);
 
@@ -196,12 +138,12 @@ public class NodeTest {
         Node nodeE = new Node("E", new ArrayList<>());
         Node nodeF = new Node("F", new ArrayList<>());
 
-        nodeA.connects(nodeB);
-        nodeB.connects(nodeC);
-        nodeC.connects(nodeD);
-        nodeD.connects(nodeE);
-        nodeE.connects(nodeF);
-        nodeB.connects(nodeD);
+        nodeA.connects(nodeB, 0.0);
+        nodeB.connects(nodeC, 0.0);
+        nodeC.connects(nodeD, 0.0);
+        nodeD.connects(nodeE, 0.0);
+        nodeE.connects(nodeF, 0.0);
+        nodeB.connects(nodeD, 0.0);
 
         List<Node> shortestPath = nodeA.findShortestPathBasedOnHopCount(nodeF);
 
@@ -211,4 +153,28 @@ public class NodeTest {
         assertTrue(shortestPath.contains(nodeF));
 
     }
+
+    @Test
+    public void shouldReturnAListWithNodeAWhenInvokedWithDestinationNodeAFromNodeA() {
+        Node nodeA = new Node("A",new ArrayList<>());
+
+        List<Node> shortestPath = new ArrayList<>(Arrays.asList(nodeA));
+
+        assertEquals(shortestPath,nodeA.findShortestPathBasedOnWeight(nodeA));
+
+    }
+
+    @Test
+    public void shouldReturnAListWithNodeAAndNodeBIfThereIsOnlyOnePathFromNodeAtoNodeBandBodeBIsNeighbourOfNodeA() {
+        Node nodeA = new Node("A",new ArrayList<>());
+        Node nodeB = new Node("B",new ArrayList<>());
+
+        nodeA.connects(nodeB, 10);
+
+        List<Node> shortestPath = new ArrayList<>(Arrays.asList(nodeA, nodeB));
+
+        assertEquals(shortestPath, nodeA.findShortestPathBasedOnWeight(nodeB));
+    }
+
+
 }

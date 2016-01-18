@@ -1,6 +1,5 @@
 
 public class Edge implements Comparable<Edge> {
-
     private final Node node;
     private final double weight;
 
@@ -14,5 +13,13 @@ public class Edge implements Comparable<Edge> {
     public int compareTo(Edge that) {
 
         return Double.compare(this.weight,that.weight);
+    }
+
+    public Node getNode() {
+        return node;
+    }
+
+    public double getWeight() {
+        return weight;
     }
 }

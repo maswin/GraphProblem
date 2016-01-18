@@ -1,76 +1,24 @@
+
 import java.util.*;
 
 public class Node {
     public String value;
-    private List<Node> neighbours;
+    private List<Edge> neighbours;
+    public static final int SELF_HOP = 0;
 
-    public Node(String value, List<Node> neighbours) {
+    public Node(String value, List<Edge> neighbours) {
         this.value = value;
         this.neighbours = neighbours;
     }
 
     public boolean canReach(Node destination) {
-        return canReach(destination, new HashSet<>());
+        return !findShortestPathBasedOnHopCount(destination).isEmpty();
     }
 
-    private boolean canReach(Node destination, Set<Node> visited) {
-        visited.add(this);
-
-        if(this==destination)
-            return true;
-
-        for(Node neighbour : neighbours) {
-            if (canReachFromThisNeighbour(neighbour, destination, visited))
-                return true;
-        }
-        return false;
+    public void connects(Node neighbour, double weight) {
+        neighbours.add(new Edge(neighbour, weight));
     }
 
-    private boolean canReachFromThisNeighbour(Node neighbour, Node destination, Set<Node> visited) {
-        if(!visited.contains(neighbour)) {
-            if (neighbour.canReach(destination, visited))
-                return true;
-        }
-        return false;
-    }
-
-    public void connects(Node neighbour) {
-        neighbours.add(neighbour);
-    }
-
-    public int findMinDistance(Node destination) {
-        return findMinDistance(destination, new HashSet<>());
-    }
-
-    private int findMinDistance(Node destination, Set<Node> visited) {
-        if(this==destination)
-            return 0;
-
-        visited.add(this);
-
-        int minDistance = getInfinity();
-
-        for(Node neighbour : neighbours) {
-            if(!visited.contains(neighbour)) {
-                Set<Node> newVisitedSet = new HashSet<>(visited);
-
-                int distance = neighbour.findMinDistance(destination, newVisitedSet);
-                if(distance != getInfinity()) {
-                    distance++;
-                    if(distance<minDistance) {
-                        minDistance = distance;
-                    }
-                }
-
-            }
-        }
-
-        return minDistance;
-    }
-
-    private int getInfinity(){
-        return Integer.MAX_VALUE;
-    }
 
     private List<Node> extractPath(Node destination, Map<Node, Node> predecessor) {
         List<Node> resultPath = new ArrayList<>();
@@ -89,7 +37,7 @@ public class Node {
 
         toProcessQueue.add(this);
         predecessorNode.put(this, null);
-        hopCount.put(this, 0);
+        hopCount.put(this, SELF_HOP);
 
         Set<Node> visited = new HashSet<>();
 
@@ -97,7 +45,8 @@ public class Node {
         Boolean found = false;
 
         while (!toProcessQueue.isEmpty()) {
-            found = toProcessQueue.pollFirst().findShortestPathUtil(destination, visited, predecessorNode, hopCount, toProcessQueue);
+            Node nextNode = toProcessQueue.pollFirst();
+            found = nextNode.BreadthFirstSearch(destination, visited, predecessorNode, hopCount, toProcessQueue);
             if(found)
                 break;
         }
@@ -109,7 +58,9 @@ public class Node {
         return resultPath;
     }
 
-    private boolean findShortestPathUtil(Node destination, Set<Node> visited, Map<Node, Node> predecessor, Map<Node, Integer> nodeHopCount, List<Node> toProcess) {
+    private boolean BreadthFirstSearch(Node destination, Set<Node> visited,
+                                       Map<Node, Node> predecessor, Map<Node, Integer> nodeHopCount,
+                                       List<Node> toProcess) {
 
         if(visited.contains(this))
             return false;
@@ -119,15 +70,30 @@ public class Node {
         if(this == destination)
             return true;
 
-        for(Node neighbour : neighbours) {
+        for(Edge neighbourEdge : neighbours) {
+            Node neighbourNode = neighbourEdge.getNode();
             int hopCount = nodeHopCount.get(this)+1;
-            if(!nodeHopCount.containsKey(neighbour)) {
-                nodeHopCount.put(neighbour, hopCount);
-                predecessor.put(neighbour, this);
-                toProcess.add(neighbour);
+            if(!nodeHopCount.containsKey(neighbourNode)) {
+                neighbourNode.updateNodeData(predecessor, nodeHopCount, toProcess, this, hopCount);
             }
         }
-
         return false;
+    }
+
+    private void updateNodeData(Map<Node, Node> predecessor, Map<Node, Integer> nodeHopCount, List<Node> toProcess,
+                                Node predecessorNode, int hopCount) {
+        nodeHopCount.put(this, hopCount);
+        predecessor.put(this, predecessorNode);
+        toProcess.add(this);
+    }
+
+    public List<Node> findShortestPathBasedOnWeight(Node destination) {
+        List<Node> resultPath = new ArrayList<>();
+        resultPath.add(this);
+        for (Edge neighbourEdge : neighbours) {
+            if(neighbourEdge.getNode().equals(destination))
+                resultPath.add(destination);
+        }
+        return resultPath;
     }
 }
